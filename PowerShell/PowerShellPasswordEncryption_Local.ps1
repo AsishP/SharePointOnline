@@ -1,11 +1,19 @@
 ## Posted by Asish Padhy - Jan 2018
 # Replace all references with <..> with your values in the below code
 
+param
+(
+ [Parameter(Mandatory=$true,HelpMessage='Please provide the password to encrypt')][ValidateNotNullOrEmpty()][String]$password,
+ [Parameter(Mandatory=$true,HelpMessage='Please provide the FilePath to save the files')][ValidateNotNullOrEmpty()][String]$filePath,
+ [Parameter(Mandatory=$true,HelpMessage='Please provide the Filename prefix for the files')][ValidateNotNullOrEmpty()][String]$fileNamePrefix
+
+)
+
 ## Encrypting the password using PowerShell and create Secure String and Key file
 
 # Set up our SecureString.
 
-$secureString = ConvertTo-SecureString -String "<Enter your password here>" -AsPlainText -Force
+$secureString = ConvertTo-SecureString -String $password -AsPlainText -Force
 
 # Demonstrating how to securely generate a new, random 32-byte AES key.
 
@@ -34,9 +42,14 @@ $encryptedSecureString = ConvertFrom-SecureString -SecureString $secureString -S
 
 # Save both the encrypted string and key to disk. Provide the path where your script will look for the password
 
-$encryptedSecureString | Out-File -FilePath "<FilePath>\<Filename>.SecureString.txt"
-$keyString | Out-File -FilePath "<FilePath>\<Filename>.Key.txt"
+$secureStringFileName = $filePath + "\" + $fileNamePrefix + ".SecureString.txt"
+$keyStringFileName = $filePath + "\" + $fileNamePrefix + ".Key.txt"
+
+$encryptedSecureString | Out-File -FilePath $secureStringFileName
+$keyString | Out-File -FilePath $keyStringFileName
 
 # Display the encrypted secure string:
+
+Write-Host "Files are created and stored at " $filePath -ForegroundColor Yellow
 
 Write-Host "Encrypted secure string: $encryptedSecureString"
